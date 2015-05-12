@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>D3 Test</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	</head>
+	<body>
+		<div class="page-header" align="center">
+			<h1>D3 Dagre <small>Test Sandbox</small></h1>
+		</div>
+
+<div id="pie"></div>
+<input type="button" value="Refresh" id="refreshBtn" />
+
+		<script src="http://d3pie.org/website/libs/jquery.js"></script>
+		<script src="http://d3pie.org/website/libs/d3.min.js"></script>
+		<script src="js/lib/d3pie.min.js"></script>
+
+<script>
+	var pie = new d3pie("pie", {
+		header: {
+			title: {
+				text: "A Very Simple Pie"
+			}
+		},
+		data: {
+			content: [
+				{ label: "JavaScript", value: 264131 },
+				{ label: "Ruby", value: 218812 },
+				{ label: "Java", value: 157618}
+			]
+		}
+	});
+
+	$(function() {
+		$("#refreshBtn").on("click", function(e) {
+			pie.redraw();
+		});
+	});
+</script>
+
+	</body>
+</html>
