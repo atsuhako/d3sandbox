@@ -18,14 +18,23 @@
 			}
 
 			.node text {
-				fill: #000;
+				fill: #fff;
 				}
 
 			.node rect {
 				stroke: #999;
-				fill: #fff;
+				fill: MidnightBlue;
 				stroke-width: 1.5px;
 			}
+
+			.selectednode text {
+				fill: #000;
+				}
+
+			.selectednode rect {
+				fill: gold;
+			}
+
 
 			.impacted rect {
 				stroke: LightSkyBlue;
@@ -41,13 +50,13 @@
 			}
 
 			.clusters {
-				stroke: #000;
-				stroke-width: 1.5px;
+				stroke: DimGray;
+				stroke-width: 1px;
 				display: block;
 				}
 
 			.cluster {
-				fill: #ff0;
+				fill: MintCream;
 				display: block;
 				}
 
@@ -82,14 +91,6 @@
 				overflow: hidden;
 				margin: 0 auto;
 			}
-
-#reload_option, #zoom_options {
-    background-color: #cccccc;
-    border-radius: 8px;
-    margin: 5px;
-    padding: 8px;
-    width: 32px;
-}
 		</style>
 	</head>
 	<body>
@@ -186,7 +187,7 @@
 			//				var g = dagreD3.graphlib.json.read(JSON.parse(str));
 
 			// Create the input graph
-			var g = new dagreD3.graphlib.Graph({multigraph: true, compound:true}).setGraph({rankdir:'TB', ranksep:10}).setDefaultEdgeLabel(function() { return {}; });
+			var g = new dagreD3.graphlib.Graph({multigraph: true, compound:true}).setGraph({rankdir:'TB'	}).setDefaultEdgeLabel(function() { return {}; });
 
 			// Here we"re setting nodeclass, which is used by our custom drawNodes function below.
 //			g.setNode("A", {label:'A', class:'selected', style:'stroke-dasharray: 10,5; stroke-width: 3px; stroke: #f00;'});
@@ -212,7 +213,7 @@
 			// More test objects
 
 			// Create nodes
-			g.setNode('Parent', { label: "Unit" } );
+			g.setNode('Parent', { label: "Unit", class: "selectednode" } );
 			g.setNode('CS1', { label: "CS1" } );
 			g.setNode('L1', { label: "L1" } );
 			g.setNode('S1', { label: "S1" } );
@@ -230,23 +231,24 @@
 			g.setParent("CS1", "fs1");
 			g.setParent("L1", "fs1");
 			g.setParent("S1", "fs1");
-			g.setParent("BFWF", "fs1");
-			g.setParent("TWF", "fs1");
+//			g.setParent("BFWF", "fs1");
+//			g.setParent("TWF", "fs1");
 
 			g.setParent("CS2", "fs2");
 			g.setParent("L2", "fs2");
 			g.setParent("S2", "fs2");
 
 			// Set edges
+			g.setEdge("Parent", "DWF", { minlen: 3 } );
+
 			g.setEdge("Parent", "CS1");
 			g.setEdge("Parent", "CS2");
-			g.setEdge("Parent", "DWF", { minlen: 3 });
 
 			g.setEdge("CS1", "L1");
 			g.setEdge("CS1", "S1");
 
-			g.setEdge("CS1", "BFWF", {label:"multiple"});
-			g.setEdge("CS1", "TWF", {label:"multiple"});
+			g.setEdge("CS1", "BFWF", { minlen: 2, label: "multiple" });
+			g.setEdge("CS1", "TWF", { minlen: 2, label: "multiple" });
 
 			g.setEdge("CS2", "L2");
 			g.setEdge("CS2", "S2");
