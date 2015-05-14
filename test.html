@@ -82,21 +82,40 @@
 				overflow: hidden;
 				margin: 0 auto;
 			}
+
+#reload_option, #zoom_options {
+    background-color: #cccccc;
+    border-radius: 8px;
+    margin: 5px;
+    padding: 8px;
+    width: 32px;
+}
 		</style>
 	</head>
 	<body>
 		<div class="page-header" align="center">
 			<h1>D3 Dagre <small>Test Sandbox</small></h1>
 		</div>
-		<div align="center">
-			<svg id="svg-canvas" width=1500 height=500><g/></svg>
-		</div>
+
+
+<div class='span9'>
+	<div id='sidebar_controls' style="padding: 10px 10px 5px 5px;position: absolute;text-align: center;width: 25px;z-index: 2;">
+		<p><button id="resetBtn" class="btn btn-danger"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span></button></p>
+		<p>
+			<button id="zoomInBtn" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+			<button id="zoomOutBtn" class="btn btn-primary"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
+		</p>
+	</div>
+	<svg id="svg-canvas" width=1500 height=500><g/></svg>
+</div>
+
+
+
+
 
 		<div class="col-sm-6 col-sm-offset-3 col-md-8 col-md-offset-2 main">
 			<div align="center">
-				<button class="btn btn-primary" onclick="zoomsvg(1);"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span> Zoom In</button>
-				<button class="btn btn-primary" onclick="zoomsvg(-1);"><span class="glyphicon glyphicon-zoom-out" aria-hidden="true"></span> Zoom Out</button>
-				<button class="btn btn-danger" onclick="reset();"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reset</button>
+
 			</div>
 
 			<form class="form-horizontal">
@@ -108,20 +127,20 @@
 				</div>
 
 				<div class="form-group">
-					<label for="zoom_translate" class="col-sm-2 control-label">Z Translate</label>
+					<label for="zoomTranslate" class="col-sm-2 control-label">Z Translate</label>
 					<div class="col-sm-2">
-						<input type="text" class="form-control" id="zoom_translate" disabled/>
+						<input type="text" class="form-control" id="zoomTranslate" disabled/>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label for="event_translate" class="col-sm-2 control-label">Translate</label>
+					<label for="eventTranslate" class="col-sm-2 control-label">Translate</label>
 					<div class="col-sm-2">
-						<input type="text" class="form-control" id="event_translate" disabled/>
+						<input type="text" class="form-control" id="eventTranslate" disabled/>
 					</div>
-					<label for="event_scale" class="col-sm-1 control-label">Scale</label>
+					<label for="eventScale" class="col-sm-1 control-label">Scale</label>
 					<div class="col-sm-1">
-						<input type="text" class="form-control" id="event_scale" disabled/>
+						<input type="text" class="form-control" id="eventScale" disabled/>
 					</div>
 				</div>
 
@@ -162,6 +181,7 @@
 		<script src="js/lib/d3pie.min.js"></script>
 		<script src="js/lib/bootstrap.min.js"></script>
 		<script>
+		$(function() {
 			//				var str = '{"options":{"directed":true},"nodes":[{"v":"0","value":{"label":"TOP NODE","class":"type-TOP","rx":5,"ry":5,"style":"fill:gold;"}},{"v":"1","value":{"label":"S","class":"type-S","rx":5,"ry":5,"style":"fill:lime;"}},{"v":"2","value":{"label":"NP","class":"type-NP","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"3","value":{"label":"DT","class":"type-DT","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"4","value":{"label":"This","class":"type-TK","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"5","value":{"label":"VP","class":"type-VP","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"6","value":{"label":"VBZ","class":"type-VBZ","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"7","value":{"label":"is","class":"type-TK","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"8","value":{"label":"NP","class":"type-NP","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"9","value":{"label":"DT","class":"type-DT","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"10","value":{"label":"an","class":"type-TK","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"11","value":{"label":"NN","class":"type-NN","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"12","value":{"label":"example","class":"type-TK","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"13","value":{"label":".","class":"type-.","rx":5,"ry":5,"style":"fill:blue;"}},{"v":"14","value":{"label":"sentences","class":"type-TK","rx":5,"ry":5,"style":"fill:blue;"}}],"edges":[{"v":"3","w":"4","value":{"label": "edge 3->4", "labelpos":"c"}},{"v":"2","w":"3","value":{}},{"v":"1","w":"2","value":{}},{"v":"6","w":"7","value":{}},{"v":"5","w":"6","value":{}},{"v":"9","w":"10","value":{}},{"v":"8","w":"9","value":{}},{"v":"11","w":"12","value":{}},{"v":"8","w":"11","value":{}},{"v":"5","w":"8","value":{}},{"v":"1","w":"5","value":{"label":"1-5"}},{"v":"13","w":"14","value":{}},{"v":"1","w":"13","value":{"label":"1-13", "lineInterpolate": "basis","labelpos":"c"}},{"v":"0","w":"1","value":{"style":"stroke: #f66; stroke-width: 3px; stroke-dasharray: 5, 5;", "arrowheadStyle": "fill: #f66;stroke-dasharray:1,1;"}}],"value":{}}';
 			//				var g = dagreD3.graphlib.json.read(JSON.parse(str));
 
@@ -169,24 +189,81 @@
 			var g = new dagreD3.graphlib.Graph({multigraph: true, compound:true}).setGraph({rankdir:'TB', ranksep:10}).setDefaultEdgeLabel(function() { return {}; });
 
 			// Here we"re setting nodeclass, which is used by our custom drawNodes function below.
-			g.setNode("A", {label:'A', class:'selected'});
-			g.setNode("B", {label:'B'});
-			g.setNode("C", {label:'C'});
-			g.setNode("D", {label:'D'});
+//			g.setNode("A", {label:'A', class:'selected', style:'stroke-dasharray: 10,5; stroke-width: 3px; stroke: #f00;'});
+//			g.setNode("B", {label:'B'});
+//			g.setNode("C", {label:'C'});
+//			g.setNode("D", {label:'D'});
 
-			g.setNode("Z", {label:'Z', class:'impacted'});
+//			g.setNode("Z", {label:'Z', class:'impacted'});
 
-			g.setNode("group", {label:'group', rankdir:'LR'});
+//			g.setNode("group", {label:'group', rankdir:'LR'});
+//
+//			g.setParent("B", "group");
+//			g.setParent("C", "group");
 
-			g.setParent("B", "group");
+//			g.setEdge("A", "B");
+//			g.setEdge("A", "C");
+//			g.setEdge("A", "D", {label:"AD1"}, "edge1");
+//			g.setEdge("A", "D", {label:"AD2"}, "edge2");
+//			g.setEdge("A", "Z", {minlen: 2, lineInterpolate: "basis"});
+//			g.setEdge("B", "Z");
+//			g.setEdge("C", "Z");
 
-			g.setEdge("A", "B");
-			g.setEdge("A", "C");
-			g.setEdge("A", "D", {label:"AD1"}, "edge1");
-			g.setEdge("A", "D", {label:"AD2"}, "edge2");
-			g.setEdge("A", "Z", {minlen: 5, lineInterpolate: "basis"});
-			g.setEdge("B", "Z");
-			g.setEdge("C", "Z");
+			// More test objects
+
+			// Create nodes
+			g.setNode('Parent', { label: "Unit" } );
+			g.setNode('CS1', { label: "CS1" } );
+			g.setNode('L1', { label: "L1" } );
+			g.setNode('S1', { label: "S1" } );
+			g.setNode('CS2', { label: "CS2" } );
+			g.setNode('L2', { label: "L2" } );
+			g.setNode('S2', { label: "S2" } );
+			g.setNode('BFWF', { label: "BF-wf" } );
+			g.setNode('TWF', { label: "T-wf" } );
+			g.setNode('DWF', { label: "D-wf" } );
+
+			g.setNode("fs1", { label:'fs1'} );
+			g.setNode("fs2", { label:'fs2'} );
+
+			// Set to container
+			g.setParent("CS1", "fs1");
+			g.setParent("L1", "fs1");
+			g.setParent("S1", "fs1");
+			g.setParent("BFWF", "fs1");
+			g.setParent("TWF", "fs1");
+
+			g.setParent("CS2", "fs2");
+			g.setParent("L2", "fs2");
+			g.setParent("S2", "fs2");
+
+			// Set edges
+			g.setEdge("Parent", "CS1");
+			g.setEdge("Parent", "CS2");
+			g.setEdge("Parent", "DWF", { minlen: 3 });
+
+			g.setEdge("CS1", "L1");
+			g.setEdge("CS1", "S1");
+
+			g.setEdge("CS1", "BFWF", {label:"multiple"});
+			g.setEdge("CS1", "TWF", {label:"multiple"});
+
+			g.setEdge("CS2", "L2");
+			g.setEdge("CS2", "S2");
+
+
+			// Round the corners of the nodes
+			g.nodes().forEach(function(v) {
+				var node = g.node(v);
+				node.rx = node.ry = 5;
+			});
+
+			// Set edge style
+			g.edges().forEach(function(v) {
+				var edge = g.edge(v);
+				edge.lineInterpolate = 'linear';
+				edge.labelpos = 'c';
+			});
 
 			// Create the renderer
 			var render = new dagreD3.render();
@@ -198,26 +275,26 @@
 			// Create zoom object
 			var zoom = d3.behavior.zoom().scaleExtent([ 1, 3 ]).on("zoom", function() {
 				// Debug information
-				document.getElementById("zoom_translate").value = d3.event.translate;
+				$('#zoomTranslate').val(d3.event.translate);
 
 				// Determine min/max bounds
 				var min_x = 125 - g.graph().width - g.graph().width * (d3.event.scale-0.8)
 				var max_x = g.graph().width * d3.event.scale < svg.attr('width') ? svg.attr('width') - g.graph().width* d3.event.scale : svg.attr('width') - g.graph().width / 2
 
-				if (g.graph().width * d3.event.scale < svg.attr('width')) {
+				if (g.graph().width * d3.event.scale < svg.node().getBoundingClientRect().width) {
 					min_x = 0;
-					max_x = svg.attr('width') - g.graph().width * d3.event.scale;
+					max_x = svg.node().getBoundingClientRect().width - g.graph().width * d3.event.scale - 3;
 				} else {
-					min_x = svg.attr('width') - g.graph().width * d3.event.scale;
-					max_x = 0;
+					min_x = svg.node().getBoundingClientRect().width - g.graph().width * d3.event.scale - 50;
+					max_x = 50;
 				} //end of else
 
-				if (g.graph().height * d3.event.scale < svg.attr('height')) {
+				if (g.graph().height * d3.event.scale < svg.node().getBoundingClientRect().height) {
 					min_y = 1;
-					max_y = svg.attr('height') - g.graph().height * d3.event.scale - 1;
+					max_y = svg.node().getBoundingClientRect().height - g.graph().height * d3.event.scale - 1;
 				} else {
-					min_y = svg.attr('height') - g.graph().height * d3.event.scale - 1;
-					max_y = 1;
+					min_y = svg.node().getBoundingClientRect().height - g.graph().height * d3.event.scale - 50;
+					max_y = 50;
 				} //end of else
 
 				var dx = Math.round(Math.min(max_x, Math.max(min_x, d3.event.translate[0])))
@@ -230,9 +307,17 @@
 				// Translate the zoom/pan
 				inner.attr("transform", "translate(" + [dx, dy] + ") " + "scale(" + d3.event.scale + ")");
 
+				// Disable zoom-in if outside the scale factor
+				//alert((d3.event.scale >= zoom.scaleExtent()[1]));
+				$('#zoomInBtn').prop("disabled", (d3.event.scale >= zoom.scaleExtent()[1]) );
+
+				// Disable zoom-out if outside the scale factor
+				$('#zoomOutBtn').prop("disabled", (d3.event.scale <= zoom.scaleExtent()[0]) );
+				//document.getElementById("rbutton_"+i).setAttribute("disabled","disabled");
+
 				// Debug information
-				document.getElementById("event_translate").value = dx + ", " + dy;
-				document.getElementById("event_scale").value = d3.event.scale;
+				$('#eventTranslate').val(dx + ", " + dy);
+				$('#eventScale').val(d3.event.scale);
 			});
 
 			// Create drag object
@@ -259,7 +344,7 @@
 			// Run the renderer. This is what draws the final graph.
 			render(inner, g);
 
-			var initialScale = 1.5;
+			var initialScale = 1;
 			zoom
 				.translate([(svg.attr("width") - g.graph().width * initialScale) / 2, (svg.attr("height") - g.graph().height * initialScale) / 2])
 				.scale(initialScale)
@@ -274,16 +359,20 @@
 			document.getElementById("g_height").value = g.graph().height;
 			document.getElementById("g_width").value = g.graph().width;
 
-			function reset() {
-				zoom
-					.translate([(svg.attr("width") - g.graph().width * initialScale) / 2, (svg.attr("height") - g.graph().height * initialScale) / 2])
-					.scale(initialScale)
-					.event(svg);
-			} //end of zoom
+			//$('#g_width').val("X");
 
-			function zoomsvg(i) {
-				zoom.translate(zoom.translate()).scale(zoom.scale()+i*0.25).event(svg);
-			} //end of zoomsvg
+			$( "#resetBtn" ).on( "click", function() {
+				zoom.translate([(svg.attr("width") - g.graph().width * initialScale) / 2, (svg.attr("height") - g.graph().height * initialScale) / 2]).scale(initialScale).event(svg);
+			});
+			$( "#zoomInBtn" ).on( "click", function() {
+				zoom.translate(zoom.translate()).scale(zoom.scale()+1*0.25).event(svg);
+			});
+			$( "#zoomOutBtn" ).on( "click", function() {
+				zoom.translate(zoom.translate()).scale(zoom.scale()-1*0.25).event(svg);
+			});
+		});
+
+
 		</script>
 
 		<script>
