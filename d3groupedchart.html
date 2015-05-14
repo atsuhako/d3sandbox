@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>D3 Grouped Bar Chart Sandbox</title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	<style>
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+
+.hoverable {
+  fill: orangered ;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+	</style>
+</head>
+<body>
+	<div class="page-header" align="center">
+		<h1>D3 Dagre <small>Test Grouped Bar Chart</small></h1>
+	</div>
+
+	<section id="sectionThree">
+		<div id="groupBarChart"></div>
+		<button class="btn btn-primary" id="refreshBtn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Refresh</button>
+	</section>
+
+	<script src="http://d3pie.org/website/libs/jquery.js"></script>
+	<script src="http://d3pie.org/website/libs/d3.min.js"></script>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
+<script>
+	var margin = {top: 20, right: 20, bottom: 30, left: 40},
+			width = 960 - margin.left - margin.right,
+			height = 500 - margin.top - margin.bottom;
+
+	var x0 = d3.scale.ordinal()
+			.rangeRoundBands([0, width], .1);
+
+	var x1 = d3.scale.ordinal();
+
+	var y = d3.scale.linear()
+			.range([height, 0]);
+
+	var color = d3.scale.ordinal()
+			.range(["#337ab7", "#5bc0de", "#f0ad4e", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+	var xAxis = d3.svg.axis()
+			.scale(x0)
+			.orient("bottom");
+
+	var yAxis = d3.svg.axis()
+			.scale(y)
+			.orient("left")
+			.tickFormat(d3.format(".2s"));
+
+	var tip = d3.tip()
+		.attr('class', 'd3-tip')
+		.offset([-10, 0])
+		.html(function(d) {
+			return "<strong>" + d.name + ":</strong> <span style='color:red'>" + d.value + "</span>";
+		})
+
+	var data = [];
+
+	function paintBarChart() {
+		var svg = d3.select("#groupBarChart").append("svg")
+			.attr("width", width + margin.left + margin.right + 48)
+			.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		svg.call(tip);
+
+		var ageNames = d3.keys(data[0]).filter(function(key) { return key !== "State"; });
+
+		data.forEach(function(d) {
+			d.ages = ageNames.map(function(name) { return {name: name, value: +d[name]}; });
+		});
+
+		x0.domain(data.map(function(d) { return d.State; }));
+		x1.domain(ageNames).rangeRoundBands([0, x0.rangeBand()]);
+		y.domain([0, d3.max(data, function(d) { return d3.max(d.ages, function(d) { return d.value; }); })]);
+
+		svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + height + ")")
+				.call(xAxis);
+
+		svg.append("g")
+				.attr("class", "y axis")
+				.call(yAxis)
+			.append("text")
+				.attr("transform", "rotate(-90)")
+				.attr("y", 6)
+				.attr("dy", ".71em")
+				.style("text-anchor", "end")
+				.text("Population");
+
+		var state = svg.selectAll(".state")
+				.data(data)
+			.enter().append("g")
+				.attr("class", "g")
+				.attr("transform", function(d) { return "translate(" + x0(d.State) + ",0)"; });
+
+		state.selectAll("rect")
+				.data(function(d) { return d.ages; })
+			.enter().append("rect")
+				.attr("width", x1.rangeBand())
+				.attr("x", function(d) { return x1(d.name); })
+				.attr("y", function(d) { return y(d.value); })
+				.attr("height", function(d) { return height - y(d.value); })
+				.style("fill", function(d) { return color(d.name); })
+				.style("class", 'hoverable')
+				.on('mouseover', tip.show)
+				.on('mouseout', tip.hide);
+
+		var legend = svg.selectAll(".legend")
+				.data(ageNames.slice())
+			.enter().append("g")
+				.attr("class", "legend")
+				.attr("transform", function(d, i) { return "translate(48, " + i * 20 + ")"; });
+
+		legend.append("rect")
+				.attr("x", width - 18)
+				.attr("width", 18)
+				.attr("height", 18)
+				.style("fill", color);
+
+		legend.append("text")
+				.attr("x", width - 24)
+				.attr("y", 9)
+				.attr("dy", ".35em")
+				.style("text-anchor", "end")
+				.text(function(d) { return d; });
+	} //end of paintBarChart
+
+	$( "#refreshBtn" ).on( "click", function() {
+		data.length = 0;
+		$('#groupBarChart').empty();
+
+		for (var i = 0; i < 12; i++) {
+			data.push({ State:i, "Value 1": Math.round(10*Math.random()), "Value 2": Math.round(10*Math.random()), "Value 3": Math.round(10*Math.random()) });
+		}
+
+		paintBarChart();
+	});
+
+	$(document).ready(function() {
+		for (var i = 0; i < 12; i++) {
+			data.push({ State:i, "Value 1": Math.round(10*Math.random()), "Value 2": Math.round(10*Math.random()), "Value 3": Math.round(10*Math.random()) });
+		}
+		paintBarChart();
+	});
+</script>
+
+</body>
+</html>

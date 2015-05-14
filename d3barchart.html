@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>D3 Bar Chart Sandbox</title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	<style>
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: #337ab7;
+}
+
+.bar:hover {
+  fill: orange;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+	</style>
+</head>
+<body>
+	<div class="page-header" align="center">
+		<h1>D3 Dagre <small>Test Bar Chart</small></h1>
+	</div>
+
+	<section id="sectionThree">
+		<div id="groupBarChart"></div>
+		<button class="btn btn-primary" id="refreshBtn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Refresh</button>
+	</section>
+
+	<script src="http://d3pie.org/website/libs/jquery.js"></script>
+	<script src="http://d3pie.org/website/libs/d3.min.js"></script>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
+
+<script>
+	var margin = {top: 40, right: 20, bottom: 30, left: 40},
+			width = 960 - margin.left - margin.right,
+			height = 500 - margin.top - margin.bottom;
+
+	var x = d3.scale.ordinal()
+			.rangeRoundBands([0, width], .1);
+
+	var y = d3.scale.linear()
+			.range([height, 0]);
+
+	var xAxis = d3.svg.axis()
+			.scale(x)
+			.orient("bottom");
+
+	var yAxis = d3.svg.axis()
+			.scale(y)
+			.orient("left");
+
+	var tip = d3.tip()
+		.attr('class', 'd3-tip')
+		.offset([-10, 0])
+		.html(function(d) {
+			return "<strong>Something:</strong> <span style='color:yellow'>" + d.tooltip + "</span>";
+		})
+
+	var data = [];
+
+	function paintBarChart() {
+		var svg = d3.select("#groupBarChart").append("svg")
+				.attr("width", width + margin.left + margin.right)
+				.attr("height", height + margin.top + margin.bottom)
+			.append("g")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		svg.call(tip);
+
+		x.domain(data.map(function(d) { return d.letter; }));
+		y.domain([0, Math.max(10, d3.max(data, function(d) { return d.frequency; }))]);
+
+		svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + height + ")")
+				.call(xAxis);
+
+		svg.append("g")
+				.attr("class", "y axis")
+				.call(yAxis)
+			.append("text")
+				.attr("transform", "rotate(-90)")
+				.attr("y", 6)
+				.attr("dy", ".71em")
+				.style("text-anchor", "end")
+				.text("Frequency");
+
+		svg.selectAll(".bar")
+				.data(data)
+			.enter().append("rect")
+				.attr("class", "bar")
+				.attr("x", function(d) { return x(d.letter); })
+				.attr("width", x.rangeBand())
+				.attr("y", function(d) { return y(d.frequency); })
+				.attr("height", function(d) { return height - y(d.frequency); })
+				.on('mouseover', tip.show)
+				.on('mouseout', tip.hide);
+	} //end of paintBarChart
+
+	$( "#refreshBtn" ).on( "click", function() {
+		data.length = 0;
+		$('#groupBarChart').empty();
+
+		for (var i = 0; i < 26; i++) {
+			data.push({letter:i, frequency: Math.round(10*Math.random()), tooltip: "X"});
+		}
+
+		paintBarChart();
+	});
+
+	$(document).ready(function() {
+		for (var i = 0; i < 26; i++) {
+			data.push({letter:i, frequency: Math.round(10*Math.random()), tooltip: "X"});
+		}
+		paintBarChart();
+	});
+</script>
+
+</body>
+</html>
